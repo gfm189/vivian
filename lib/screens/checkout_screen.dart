@@ -24,6 +24,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   final _emailController = TextEditingController();
   final _taxNumberController = TextEditingController();
 
+  // Create a NumberFormat instance for consistent currency formatting
+  final currencyFormatter = NumberFormat('#,##0.00', 'en_US');
+
   DateTime? _selectedDate;
   String? _selectedTimeSlot;
   List<String> _availableTimeSlots = [];
@@ -309,6 +312,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         ),
       );
     }
+  }
+
+  // Helper method to format prices consistently
+  String formatPrice(double price) {
+    return '${currencyFormatter.format(price)} SAR';
   }
 
   @override
@@ -650,8 +658,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           itemCount: cartProvider.items.length,
                           itemBuilder: (ctx, i) {
                             final item = cartProvider.items[i];
-                            // Calculate price including VAT (15%)
-                            final priceWithVat = double.parse(item.product.price);
+                            // Parse and format the price properly
+                            final priceWithVat = double.tryParse(item.product.price) ?? 0.0;
                             final totalPrice = priceWithVat * item.quantity;
 
                             return Padding(
@@ -681,7 +689,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                     ),
                                   ),
                                   Text(
-                                    '${totalPrice.toStringAsFixed(2)} SAR',
+                                    formatPrice(totalPrice),
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -709,7 +717,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                   ),
                                 ),
                                 Text(
-                                  '${cartProvider.totalAmount.toStringAsFixed(2)} SAR',
+                                  formatPrice(cartProvider.totalAmount),
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -728,7 +736,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                   ),
                                 ),
                                 Text(
-                                  '${cartProvider.totalAmount.toStringAsFixed(2)} SAR',
+                                  formatPrice(cartProvider.totalAmount),
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
